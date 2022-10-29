@@ -7,10 +7,9 @@
         mc:Ignorable="d"
         Title="WSR" SizeToContent="WidthAndHeight">
     <Grid Height="110" Width="200">
-        <Button Content="Change port" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Click="Button_Click" Width="72" Height="32"/>
-        <Label x:Name="Label_Port" Content="Port: 0000" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="72
-               "/>
-        <Label x:Name="Label_Status" Content="Status" HorizontalAlignment="Left" Margin="10,78,0,0" VerticalAlignment="Top" Width="72"/>
+        <Button Content="Set port" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Click="Button_Click" Width="72" Height="32"/>
+        <Label x:Name="Label_Port" Content="Port: 0000" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="72" HorizontalContentAlignment="Center"/>
+        <Label x:Name="Label_Status" Content="Status" HorizontalAlignment="Left" Margin="10,78,0,0" VerticalAlignment="Top" Width="72" HorizontalContentAlignment="Center" />
         <Label x:Name="Label_Stats" Content="Statistics" HorizontalAlignment="Left" Margin="87,0,0,0" VerticalAlignment="Center" Height="92" Width="103"/>
 
     </Grid>

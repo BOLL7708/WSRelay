@@ -62,11 +62,11 @@ namespace WSRelay
                         {
                             case SuperServer.ServerStatus.Connected:
                                 Label_Status.Background = Brushes.OliveDrab;
-                                Label_Status.Content = "Connected";
+                                Label_Status.Content = "Online";
                                 break;
                             case SuperServer.ServerStatus.Disconnected:
                                 Label_Status.Background = Brushes.Tomato;
-                                Label_Status.Content = "Disconnected";
+                                Label_Status.Content = "Offline";
                                 break;
                             case SuperServer.ServerStatus.Error:
                                 Label_Status.Background = Brushes.Gray;
