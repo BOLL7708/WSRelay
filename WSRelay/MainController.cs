@@ -46,6 +46,11 @@ namespace WSRelay
                     _server.SendMessage(session, $"SUCCESS: Connected for channel [{inChannel}]");
                     return;
                 }
+                if(inChannel.Length > 0)
+                {
+                    _server.SendMessage(session, $"SUCCESS: Already connected to channel [{inChannel}]");
+                    return;
+                }
                 
                 // We are in a channel.
                 if(hasChannel && channel != null && channel.Length > 0)
@@ -57,6 +62,7 @@ namespace WSRelay
                     if (!channelHasPassword && inPassword.Length > 0)
                     {
                         _passwords[channel] = inPassword;
+                        _authorizations[session.SessionID] = true;
                         _server.SendMessage(session, $"SUCCESS: Set a password for channel [{channel}]");
                         return;
                     }
@@ -76,7 +82,12 @@ namespace WSRelay
                             return;
                         }
                     }
-                    
+                    if (inPassword.Length > 0)
+                    {
+                        _server.SendMessage(session, $"SUCCESS: Already authorized for channel [{channel}]");
+                        return;
+                    }
+
                     // Broadcast to channel
                     List<string> sessionIDs = new();
                     foreach(string key in _channels.Keys)
