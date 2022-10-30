@@ -21,6 +21,7 @@ namespace WSRelay
         ConcurrentDictionary<string, bool> _authorizations = new();
 
         public Action<ServerStatus, int> StatusAction = (status, count) => { };
+        private const string PREFIX = ":::";
 
         public MainController() {
             _server.StatusAction += (status, count) =>
@@ -45,17 +46,17 @@ namespace WSRelay
                 if(!hasChannel && inChannel.Length > 0)
                 {
                     _channels[session.SessionID] = inChannel;
-                    _server.SendMessage(session, $"SUCCESS:10:Connected to #{inChannel}");
+                    _server.SendMessage(session, $"{PREFIX}SUCCESS:10:Connected to #{inChannel}");
                     return;
                 }
                 if(inChannel.Length > 0 && channel.Length > 0)
                 {
-                    _server.SendMessage(session, $"SUCCESS:11:Already connected to #{channel}");
+                    _server.SendMessage(session, $"{PREFIX}SUCCESS:11:Already connected to #{channel}");
                     return;
                 }
                 if(!hasChannel || channel == null || channel.Length == 0)
                 {
-                    _server.SendMessage(session, "ERROR:50:Not in a channel");
+                    _server.SendMessage(session, "{PREFIX}ERROR:50:Not in a channel");
                     return;
                 }
                 
@@ -68,7 +69,7 @@ namespace WSRelay
                 {
                     _passwords[channel] = inPassword;
                     _authorizations[session.SessionID] = true;
-                    _server.SendMessage(session, $"SUCCESS:20:Password set for #{channel}");
+                    _server.SendMessage(session, $"{PREFIX}SUCCESS:20:Password set for #{channel}");
                     return;
                 }
 
@@ -80,16 +81,16 @@ namespace WSRelay
                     if(inPassword.Length > 0 && inPassword == password) // A password was supplied, try to match it.
                     {
                         _authorizations[session.SessionID] = true;
-                        _server.SendMessage(session, $"SUCCESS:21:Authorized for #{channel}");
+                        _server.SendMessage(session, $"{PREFIX}SUCCESS:21:Authorized for #{channel}");
                         return;
                     } else {
-                        _server.SendMessage(session, $"ERROR:51:Not authorized for #{channel}");
+                        _server.SendMessage(session, $"{PREFIX}ERROR:51:Not authorized for #{channel}");
                         return;
                     }
                 }
                 if (inPassword.Length > 0)
                 {
-                    _server.SendMessage(session, $"SUCCESS:22:Already authorized for #{channel}");
+                    _server.SendMessage(session, $"{PREFIX}SUCCESS:22:Already authorized for #{channel}");
                     return;
                 }
 
@@ -112,9 +113,9 @@ namespace WSRelay
 
         private string GetCommandValue(string command, string message, bool toLowerCase = false, bool filterAlphaNumerical = false)
         {
-            if(message.StartsWith($"{command}:"))
+            if(message.StartsWith($"{PREFIX}{command}:"))
             {
-                var arr = message.Split(':');
+                var arr = message.Substring(PREFIX.Length).Split(':');
                 if(arr.Length == 2 && arr[0] == command)
                 {
                     var value = arr[1].Trim();
