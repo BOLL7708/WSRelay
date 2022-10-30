@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.ServiceModel.Channels;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static BOLL7708.SuperServer;
 
@@ -33,78 +34,75 @@ namespace WSRelay
             };
             _server.MessageReceivedAction += (WebSocketSession session, string message) =>
             {
+                // Empty message is ignored.
                 if (message.Length == 0) return;
 
                 // Check if session is signed into a channel.
                 // If the channel command was provided, we set the channel.
                 // Error out if no channel.
                 var hasChannel = _channels.TryGetValue(session.SessionID, out string? channel);
-                var inChannel = GetCommandValue("CHANNEL", message);
+                var inChannel = GetCommandValue("CHANNEL", message, true, true);
                 if(!hasChannel && inChannel.Length > 0)
                 {
                     _channels[session.SessionID] = inChannel;
-                    _server.SendMessage(session, $"SUCCESS: Connected for channel [{inChannel}]");
+                    _server.SendMessage(session, $"SUCCESS:10:Connected to #{inChannel}");
                     return;
                 }
-                if(inChannel.Length > 0)
+                if(inChannel.Length > 0 && channel.Length > 0)
                 {
-                    _server.SendMessage(session, $"SUCCESS: Already connected to channel [{inChannel}]");
+                    _server.SendMessage(session, $"SUCCESS:11:Already connected to #{channel}");
+                    return;
+                }
+                if(!hasChannel || channel == null || channel.Length == 0)
+                {
+                    _server.SendMessage(session, "ERROR:50:Not in a channel");
                     return;
                 }
                 
                 // We are in a channel.
-                if(hasChannel && channel != null && channel.Length > 0)
+                // Check if a password has been set for this channel.
+                // If not, but the password command was provided, we set the password.
+                var channelHasPassword = _passwords.TryGetValue(channel, out string? password);
+                var inPassword = GetCommandValue("PASSWORD", message);
+                if (!channelHasPassword && inPassword.Length > 0)
                 {
-                    // Check if a password has been set for this channel.
-                    // If not, but the password command was provided, we set the password.
-                    var channelHasPassword = _passwords.TryGetValue(channel, out string? password);
-                    var inPassword = GetCommandValue("PASSWORD", message);
-                    if (!channelHasPassword && inPassword.Length > 0)
-                    {
-                        _passwords[channel] = inPassword;
-                        _authorizations[session.SessionID] = true;
-                        _server.SendMessage(session, $"SUCCESS: Set a password for channel [{channel}]");
-                        return;
-                    }
-
-                    // If the channel has a password, check so this user has matched said password.
-                    // Error out if there is no match.
-                    var hasAuthorized = _authorizations.TryGetValue(session.SessionID, out bool authed);
-                    if (channelHasPassword && (!hasAuthorized || !authed))
-                    {
-                        if(inPassword.Length > 0 && inPassword == password) // A password was supplied, try to match it.
-                        {
-                            _authorizations[session.SessionID] = true;
-                            _server.SendMessage(session, $"SUCCESS: Authorized for channel [{channel}]");
-                            return;
-                        } else {
-                            _server.SendMessage(session, $"ERROR: Not authorized for channel [{channel}]");
-                            return;
-                        }
-                    }
-                    if (inPassword.Length > 0)
-                    {
-                        _server.SendMessage(session, $"SUCCESS: Already authorized for channel [{channel}]");
-                        return;
-                    }
-
-                    // Broadcast to channel
-                    List<string> sessionIDs = new();
-                    foreach(string key in _channels.Keys)
-                    {
-                        if (_channels[key] == channel && key != session.SessionID)
-                        {
-                            sessionIDs.Add(key);
-                        }
-                    }
-                    _server.SendMessageToGroup(sessionIDs.ToArray(), message);
-                    return;
-                } else
-                {
-                    // Not yet connected to a channel, so we error out.
-                    _server.SendMessage(session, "ERROR: Not connected to any channel");
+                    _passwords[channel] = inPassword;
+                    _authorizations[session.SessionID] = true;
+                    _server.SendMessage(session, $"SUCCESS:20:Password set for #{channel}");
                     return;
                 }
+
+                // If the channel has a password, check so this user has matched said password.
+                // Error out if there is no match.
+                var hasAuthorized = _authorizations.TryGetValue(session.SessionID, out bool authed);
+                if (channelHasPassword && (!hasAuthorized || !authed))
+                {
+                    if(inPassword.Length > 0 && inPassword == password) // A password was supplied, try to match it.
+                    {
+                        _authorizations[session.SessionID] = true;
+                        _server.SendMessage(session, $"SUCCESS:21:Authorized for #{channel}");
+                        return;
+                    } else {
+                        _server.SendMessage(session, $"ERROR:51:Not authorized for #{channel}");
+                        return;
+                    }
+                }
+                if (inPassword.Length > 0)
+                {
+                    _server.SendMessage(session, $"SUCCESS:22:Already authorized for #{channel}");
+                    return;
+                }
+
+                // Broadcast to other sessions in channel
+                List<string> sessionIDs = new();
+                foreach(string key in _channels.Keys)
+                {
+                    if (_channels[key] == channel && key != session.SessionID)
+                    {
+                        sessionIDs.Add(key);
+                    }
+                }
+                _server.SendMessageToGroup(sessionIDs.ToArray(), message);
             };
         }
 
@@ -112,7 +110,7 @@ namespace WSRelay
             _server.Start(port);
         }
 
-        private string GetCommandValue(string command, string message)
+        private string GetCommandValue(string command, string message, bool toLowerCase = false, bool filterAlphaNumerical = false)
         {
             if(message.StartsWith($"{command}:"))
             {
@@ -120,6 +118,11 @@ namespace WSRelay
                 if(arr.Length == 2 && arr[0] == command)
                 {
                     var value = arr[1].Trim();
+                    if(value.Length > 0)
+                    {
+                        if (toLowerCase) value = value.ToLower();
+                        if (filterAlphaNumerical) value = Regex.Replace(value, "[^a-zA-Z0-9]", "");
+                    }
                     return value;
                 }
             }
