@@ -155,17 +155,18 @@ namespace WSRelay
         {
             var ok = _stateDic.TryGetValue(key, out int oldValue);
             return ok && _stateDic.TryUpdate(key, value, oldValue);
-
         }
 
-        private void Window_StateChanged(object sender, EventArgs e)
+        protected override void OnStateChanged(EventArgs e)
         {
             WindowUtils.OnStateChange(this, false);
+            base.OnStateChanged(e);
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
             WindowUtils.DestroyTrayIcon();
+            base.OnClosing(e);
         }
     }
 }

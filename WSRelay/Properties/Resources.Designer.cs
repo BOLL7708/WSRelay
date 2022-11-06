@@ -80,7 +80,7 @@ namespace WSRelay.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to v0.4.
+        ///   Looks up a localized string similar to v0.10.
         /// </summary>
         internal static string Version {
             get {

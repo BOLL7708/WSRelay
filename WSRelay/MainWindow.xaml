@@ -11,6 +11,5 @@
         <Label x:Name="Label_Port" Content="Port: 0000" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="72" HorizontalContentAlignment="Center"/>
         <Label x:Name="Label_Status" Content="Status" HorizontalAlignment="Left" Margin="10,78,0,0" VerticalAlignment="Top" Width="72" HorizontalContentAlignment="Center" />
         <Label x:Name="Label_Stats" Content="Statistics" HorizontalAlignment="Left" Margin="87,0,0,0" VerticalAlignment="Center" Height="92" Width="103"/>
-
     </Grid>
 </Window>
