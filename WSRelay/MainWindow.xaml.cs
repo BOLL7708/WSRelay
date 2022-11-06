@@ -41,7 +41,9 @@ namespace WSRelay
             InitializeComponent();
 
             WindowUtils.CheckIfAlreadyRunning("WSRelay");
-            // WindowUtils.Minimize(this, false); // TODO: Use this when we actually have a tray icon.
+            var icon = Properties.Resources.Logo.Clone() as System.Drawing.Icon;
+            WindowUtils.CreateTrayIcon(this, icon, Properties.Resources.AppName);
+            WindowUtils.Minimize(this, false);
 
             UpdatePortLabel();
 

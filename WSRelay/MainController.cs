@@ -49,14 +49,14 @@ namespace WSRelay
                     _server.SendMessage(session, $"{PREFIX}SUCCESS:10:Connected to #{inChannel}");
                     return;
                 }
-                if(inChannel.Length > 0 && channel.Length > 0)
+                if(inChannel.Length > 0 && channel != null && channel.Length > 0)
                 {
                     _server.SendMessage(session, $"{PREFIX}SUCCESS:11:Already connected to #{channel}");
                     return;
                 }
                 if(!hasChannel || channel == null || channel.Length == 0)
                 {
-                    _server.SendMessage(session, "{PREFIX}ERROR:50:Not in a channel");
+                    _server.SendMessage(session, $"{PREFIX}ERROR:50:Not in a channel");
                     return;
                 }
                 
