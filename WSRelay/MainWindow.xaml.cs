@@ -34,7 +34,7 @@ namespace WSRelay
             KEY_SECOND_OUT = "second_out",
             KEY_SESSION_COUNT = "session_count",
             KEY_MESSAGES_IN_TOTAL = "messages_in_total",
-            KEY_MESSAGES_OUT_TOTAL = "messages_in_total";
+            KEY_MESSAGES_OUT_TOTAL = "messages_out_total";
 
         public MainWindow()
         {
