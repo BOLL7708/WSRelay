@@ -6,16 +6,16 @@ This application is a simple Websocket relay server, runs on Windows 10 (at leas
 ## Usage
 1. Run the application, it automatically minimizes to the system tray.
 2. Click the system tray icon (hash-tag-like smiley) to open the application window.
-2. Change the port in the application window if need be, default is `7788`.
-3. Launch a client and connect to `ws://localhost:7788` or with your custom port. If you are running this on another machine on the network, use that IP.
-4. Use the command messages in the next section to enable broadcasting.
+3. Change the port in the application window if need be, default is `7788`.
+4. Launch a client and connect to `ws://localhost:7788` or with your custom port. If you are running this on another machine on the network, use that IP.
+5. Use the command messages in the next section to connect to a channel and optionally authorize, or skip that to send message to the general channel you are automatically in from the start.
 
 ## Commands
 Commands are sent as raw text using reserved prefixed (`:::`) keywords, there are only two, listed below.
 ### Channel
-To be able to send and receive messages the client needs to connect to a channel.  
+You are automatically connected to a non-protected general channel upon first connection, to narrow down communication the client needs to connect to a channel.  
 Any channel name used will filter down to only lower-case alpha-numerical characters.  
-A channel is automatically allocated when connecting.
+A channel is automatically allocated when connecting to it.
 ```
 :::CHANNEL:yourchannel
 ```
